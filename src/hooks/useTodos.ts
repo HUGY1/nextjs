@@ -3,18 +3,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Todo, FilterType } from '@/types/todo'
 import * as api from '@/lib/api'
-import { warn } from 'console'
-
 
 interface UseTodosParams {
   initialTodos?: Todo[]
-
+  /** SSR 已拉取列表时跳过首次客户端请求，避免重复 */
+  skipInitialFetch?: boolean
 }
 
-export function useTodos(params: UseTodosParams) {
-  const {initialTodos = []} = params
+export const useTodos = (params: UseTodosParams) => {
+  const { initialTodos = [], skipInitialFetch = false } = params
   const [todos, setTodos] = useState<Todo[]>(initialTodos)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!skipInitialFetch)
   const [error, setError] = useState<string | null>(null)
 
   const fetchTodos = useCallback(async () => {
@@ -23,7 +22,7 @@ export function useTodos(params: UseTodosParams) {
 
     try {
       const { data } = await api.getTodos()
-      let res = data.items
+      const res = data.items
       setTodos(res)
 
       return res
@@ -36,32 +35,28 @@ export function useTodos(params: UseTodosParams) {
     }
   }, [])
 
+  useEffect(() => {
+    if (skipInitialFetch) return
+    fetchTodos()
+  }, [fetchTodos, skipInitialFetch])
 
-
-  const addTodo = useCallback(
-    async (title: string) => {
-      if (!title.trim()) return
-      setError(null)
-      try {
-        const { data: created } = await api.addTodo(title.trim(), false)
-        setTodos((prev) => [...prev, created])
-      } catch (e) {
-        setError(e instanceof Error ? e.message : '添加失败')
-      }
-    },
-    []
-  )
+  const addTodo = useCallback(async (title: string) => {
+    if (!title.trim()) return
+    setError(null)
+    try {
+      const { data: created } = await api.addTodo(title.trim(), false)
+      setTodos((prev) => [...prev, created])
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '添加失败')
+    }
+  }, [])
 
   const toggleTodo = useCallback(async (id: string) => {
     setError(null)
     try {
       const { data: updated } = await api.updateTodo(id)
 
-      console.warn('updated',updated);
-      
-      setTodos((prev) =>
-        prev.map((t) => (t.id === id ? updated : t))
-      )
+      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)))
     } catch (e) {
       setError(e instanceof Error ? e.message : '更新失败')
     }

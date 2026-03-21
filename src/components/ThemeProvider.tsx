@@ -1,5 +1,6 @@
 'use client'
 
+import type { FC, ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 type Theme = 'light' | 'dark'
@@ -11,7 +12,7 @@ const ThemeContext = createContext<{
 
 const STORAGE_KEY = 'todo-app-theme'
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>('light')
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function useTheme() {
+export const useTheme = () => {
   const ctx = useContext(ThemeContext)
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider')
   return ctx

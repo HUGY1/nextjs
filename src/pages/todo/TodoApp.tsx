@@ -1,7 +1,10 @@
 'use client'
 
+import type { FC } from 'react'
 import { useState, useRef } from 'react'
-import { useTheme } from './ThemeProvider'
+import { useRouter } from 'next/router'
+import { useTheme } from '../../components/ThemeProvider'
+import { useAuthStore } from '@/stores/authStore'
 import { useTodos } from '@/hooks/useTodos'
 import type { Todo, FilterType } from '@/types/todo'
 import TodoItem from './TodoItem'
@@ -15,10 +18,14 @@ const FILTERS: { key: FilterType; label: string }[] = [
 ]
 interface TodoAppProps {
   initialTodos: Todo[]
+  /** SSR 已拉取列表时跳过 useTodos 首次请求 */
+  skipInitialFetch?: boolean
 }
-export default function TodoApp({ initialTodos }: TodoAppProps) {
-  console.warn('initialTodos',initialTodos);
-  
+
+const TodoApp: FC<TodoAppProps> = ({ initialTodos, skipInitialFetch = false }) => {
+  const router = useRouter()
+  const logout = useAuthStore((s) => s.logout)
+  const userName = useAuthStore((s) => s.user?.userName)
   const { theme, setTheme } = useTheme()
   const inputRef = useRef<HTMLInputElement>(null)
   const [filter, setFilter] = useState<FilterType>('all')
@@ -36,7 +43,8 @@ export default function TodoApp({ initialTodos }: TodoAppProps) {
     error,
     refetch,
   } = useTodos({
-    initialTodos
+    initialTodos,
+    skipInitialFetch,
   })
 
   const displayList = filtered(filter)
@@ -73,14 +81,35 @@ export default function TodoApp({ initialTodos }: TodoAppProps) {
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>Todo List</h1>
-          <button
-            type="button"
-            className={styles.themeBtn}
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            aria-label={theme === 'light' ? '切换到夜间模式' : '切换到亮色模式'}
-          >
-            {theme === 'light' ? <IconSun /> : <IconMoon />}
-          </button>
+          <div className={styles.headerActions}>
+            {userName && (
+              <span className={styles.userLabel} title={userName}>
+                {userName}
+              </span>
+            )}
+            <button
+              type="button"
+              className={styles.logoutBtn}
+              onClick={async () => {
+                try {
+                  await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+                } finally {
+                  logout()
+                  router.replace('/login')
+                }
+              }}
+            >
+              退出
+            </button>
+            <button
+              type="button"
+              className={styles.themeBtn}
+              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+              aria-label={theme === 'light' ? '切换到夜间模式' : '切换到亮色模式'}
+            >
+              {theme === 'light' ? <IconSun /> : <IconMoon />}
+            </button>
+          </div>
         </header>
 
         {error && (
@@ -100,10 +129,7 @@ export default function TodoApp({ initialTodos }: TodoAppProps) {
             </span>
           </div>
           <div className={styles.progressTrack}>
-            <div
-              className={styles.progressBar}
-              style={{ width: `${progress}%` }}
-            />
+            <div className={styles.progressBar} style={{ width: `${progress}%` }} />
           </div>
         </section>
 
@@ -168,3 +194,5 @@ export default function TodoApp({ initialTodos }: TodoAppProps) {
     </div>
   )
 }
+
+export default TodoApp

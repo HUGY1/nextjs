@@ -1,0 +1,44 @@
+---
+description: 项目 TypeScript/React 风格（与根目录 SKILL.md 一致）
+alwaysApply: true
+---
+
+# 代码风格（SKILL.md）
+
+## 空返回 Promise 调用不要写 `void`
+
+```ts
+// 正确
+fetchTodos()
+router.replace('/')
+
+// 错误
+void fetchTodos()
+void router.replace('/')
+```
+
+## 函数与组件：用 `const` 箭头，不用 `function` 声明
+
+```ts
+// 正确
+export const useTodos = (params: UseTodosParams) => { ... }
+export const getTodos = async () => { ... }
+
+// 错误
+export function useTodos() {}
+```
+
+## React 组件：使用 `FC` + 箭头函数
+
+```tsx
+import type { FC } from 'react'
+
+const TodoApp: FC<TodoAppProps> = (props) => { ... }
+export default TodoApp
+```
+
+避免 `export default function TodoApp() {}`。
+
+## 参考
+
+根目录 `SKILL.md` 为人工可读摘要；本规则供 AI 会话始终遵循。
