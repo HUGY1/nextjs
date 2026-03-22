@@ -3,12 +3,12 @@
 import type { FC } from 'react'
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { useTheme } from '../../components/ThemeProvider'
+import { useTheme } from '@/components/ThemeProvider'
 import { useAuthStore } from '@/stores/authStore'
 import { useTodos } from '@/hooks/useTodos'
 import type { Todo, FilterType } from '@/types/todo'
 import TodoItem from './TodoItem'
-import { IconPlus, IconSun, IconMoon, IconList } from './icons'
+import { IconPlus, IconSun, IconMoon, IconList } from '@/components/todo/icons'
 import styles from './TodoApp.module.css'
 
 const FILTERS: { key: FilterType; label: string }[] = [

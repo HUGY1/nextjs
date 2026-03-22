@@ -3,7 +3,7 @@ import type { GetServerSideProps } from 'next'
 import type { Todo } from '@/types/todo'
 import { fetchTodosForGssp } from '@/lib/server/fetchTodos'
 import { AuthRequire } from '@/components/AuthRequire'
-import TodoApp from '@/pages/todo/TodoApp'
+import TodoApp from '@/components/todo/TodoApp'
 
 export type HomePageProps = {
   initialTodos: Todo[]

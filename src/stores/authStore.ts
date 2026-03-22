@@ -78,6 +78,7 @@ export const useAuthStore = create<AuthState>()(
 
 export const fetchAuthSession = async () => {
   const { setUser, logout, setSessionReady, user } = useAuthStore.getState()
+
   try {
     // 与后端 /api/get-user 一致：POST + { userId }；无本地 user 时传 0，由 BFF 从 JWT 补全
     const json = await request<{ success?: boolean; data?:  AuthUser  }>('/api/get-user', {
