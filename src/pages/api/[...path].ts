@@ -5,6 +5,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getBackendBase } from '@/lib/server/backend'
 import { proxyApiToBackend } from '@/lib/bff/proxyUpstream'
 
+// export const runtime = 'edge'
+
 const BASE = getBackendBase()
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

@@ -4,7 +4,6 @@ import type { FC, ReactNode } from 'react'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAuthStore, selectIsAuthenticated } from '@/stores/authStore'
-import styles from './AuthRequire.module.css'
 
 export type AuthRequireProps = {
   children: ReactNode
@@ -16,12 +15,6 @@ export type AuthRequireProps = {
    */
   serverAuthenticated?: boolean
 }
-
-const DefaultFallback = () => (
-  <div className={styles.wrap}>
-    <p className={styles.muted}>加载中…</p>
-  </div>
-)
 
 /**
  * 客户端鉴权：persist + session 完成后再判断；未登录则 replace 到 `/login?next=当前路径`。
@@ -38,19 +31,23 @@ export const AuthRequire: FC<AuthRequireProps> = ({
 
   useEffect(() => {
     if (!hydrated || !sessionReady) return
+    console.log('isAuthed', isAuthed)
+    console.log('serverAuthenticated', serverAuthenticated)
     if (!isAuthed && !serverAuthenticated) {
       const path = router.asPath || '/'
       const next = encodeURIComponent(path.startsWith('/') ? path : `/${path}`)
+      console.log('这里？？？')
       router.replace(`/login?next=${next}`)
     }
-  }, [hydrated, sessionReady, isAuthed, serverAuthenticated, router])
+    // 勿依赖整个 router 对象：其引用常变会导致 effect 反复跑、重复 replace / 拉取 _next/data
+  }, [hydrated, sessionReady, isAuthed, serverAuthenticated, router.asPath])
 
   if (!hydrated || !sessionReady) {
-    return serverAuthenticated ? <>{children}</> : <>{fallback ?? <DefaultFallback />}</>
+    return serverAuthenticated ? <>{children}</> : <></>
   }
 
   if (!isAuthed && !serverAuthenticated) {
-    return <>{fallback ?? <DefaultFallback />}</>
+    return <></>
   }
 
   return <>{children}</>

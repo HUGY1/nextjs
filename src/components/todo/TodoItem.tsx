@@ -1,6 +1,7 @@
 'use client'
 
 import type { FC } from 'react'
+import Link from 'next/link'
 import type { Todo } from '@/types/todo'
 import { IconCheck, IconTrash, IconCircle, IconCheckCircle } from '@/components/todo/icons'
 import styles from './TodoItem.module.css'
@@ -26,7 +27,9 @@ const TodoItem: FC<Props> = ({ todo, onToggle, onDelete, style }) => (
         <IconCircle className={styles.checkIcon} />
       )}
     </button>
-    <span className={styles.title}>{todo.value}</span>
+    <Link href={`/detail/${todo.id}`} prefetch={false} className={styles.titleLink}>
+      {todo.value}
+    </Link>
     <button
       type="button"
       className={styles.deleteBtn}

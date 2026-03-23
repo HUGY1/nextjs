@@ -1,20 +1,18 @@
 import type { FC } from 'react'
-import { useState, useEffect, FormEvent } from 'react'
+import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import {
   useAuthStore,
-  selectIsAuthenticated,
-  type LoginApiResponse,
   type LoginDataPublic,
 } from '@/stores/authStore'
 import styles from './login/login.module.css'
+import { request } from '@/lib/httpClient'
 
 const LoginPage: FC = () => {
   const router = useRouter()
   const hydrated = useAuthStore((s) => s._hasHydrated)
   const sessionReady = useAuthStore((s) => s._sessionReady)
-  const isAuthed = useAuthStore(selectIsAuthenticated)
   const setUserFromLogin = useAuthStore((s) => s.setUserFromLogin)
 
   const [username, setUsername] = useState('')
@@ -22,41 +20,22 @@ const LoginPage: FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!hydrated || !sessionReady) return
-    if (isAuthed) {
-      const next = typeof router.query.next === 'string' ? router.query.next : '/'
-      router.replace(next.startsWith('/') ? next : '/')
-    }
-  }, [hydrated, sessionReady, isAuthed, router])
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
     setSubmitting(true)
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password }),
+      const res = await request<{ data: LoginDataPublic }>('/api/auth/login', {
+        body: { username: username.trim(), password }
       })
-      const json = (await res.json()) as LoginApiResponse
 
-      if (!res.ok || json.success !== true || !json.data?.user) {
-        const msg =
-          (typeof json.error === 'string' && json.error) ||
-          (typeof json.message === 'string' && json.message) ||
-          '登录失败'
-        setError(msg)
-        return
-      }
-
-      setUserFromLogin(json.data as LoginDataPublic)
-      const next = typeof router.query.next === 'string' ? router.query.next : '/'
-      router.replace(next.startsWith('/') ? next : '/')
+      console.log('res', res)
+      setUserFromLogin(res.data as LoginDataPublic)
+      router.push('/')
     } catch {
-      setError('网络错误，请重试')
+      setError('登录失败')
     } finally {
       setSubmitting(false)
     }
@@ -72,9 +51,6 @@ const LoginPage: FC = () => {
     )
   }
 
-  if (isAuthed) {
-    return null
-  }
 
   return (
     <div className={styles.page}>
@@ -123,7 +99,7 @@ const LoginPage: FC = () => {
           登录请求由 BFF 代理至后端 <code>POST /login</code>；JWT 仅存 HttpOnly Cookie，前端不保存 token。
         </p>
 
-        <Link href="/" className={styles.back}>
+        <Link href="/" prefetch={false} className={styles.back}>
           返回首页
         </Link>
       </div>

@@ -13,7 +13,7 @@ export type HttpResponseInterceptor = (
 
 /** 统一 POST：body 为对象，内部 JSON.stringify；不可传 method */
 export type HttpRequestOptions = Omit<RequestInit, 'method' | 'body'> & {
-  body: object
+  body?: object
 }
 
 const getApiBase = (): string => {

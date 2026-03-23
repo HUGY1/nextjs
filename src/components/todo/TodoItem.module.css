@@ -20,7 +20,7 @@
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-.item.completed .title {
+.item.completed .titleLink {
   color: var(--text-tertiary);
   text-decoration: line-through;
 }
@@ -60,13 +60,19 @@
   color: var(--success);
 }
 
-.title {
+.titleLink {
   flex: 1;
+  min-width: 0;
   font-size: 1rem;
   line-height: 1.5;
   color: var(--text-primary);
   text-align: left;
+  text-decoration: none;
   transition: color var(--transition);
+}
+
+.titleLink:hover {
+  color: var(--accent);
 }
 
 .deleteBtn {

@@ -32,6 +32,7 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx)
   } catch (e) {
     const msg = e instanceof Error ? e.message : ''
     if (msg === 'NO_AUTH' || msg === 'UNAUTHORIZED') {
+      console.log('NO_AUTH')
       return {
         redirect: {
           destination: `/login?next=${encodeURIComponent(nextPath)}`,
@@ -39,7 +40,9 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx)
         },
       }
     }
+    console.log('???',msg)
     return {
+
       redirect: {
         destination: `/login?next=${encodeURIComponent(nextPath)}`,
         permanent: false,

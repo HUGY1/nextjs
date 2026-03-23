@@ -10,6 +10,7 @@ import type { Todo, FilterType } from '@/types/todo'
 import TodoItem from './TodoItem'
 import { IconPlus, IconSun, IconMoon, IconList } from '@/components/todo/icons'
 import styles from './TodoApp.module.css'
+import { request } from '@/lib/httpClient'
 
 const FILTERS: { key: FilterType; label: string }[] = [
   { key: 'all', label: '全部' },
@@ -92,7 +93,7 @@ const TodoApp: FC<TodoAppProps> = ({ initialTodos, skipInitialFetch = false }) =
               className={styles.logoutBtn}
               onClick={async () => {
                 try {
-                  await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+                  await request('/api/auth/logout', {  })
                 } finally {
                   logout()
                   router.replace('/login')
