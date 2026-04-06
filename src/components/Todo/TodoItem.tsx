@@ -3,7 +3,7 @@
 import type { FC } from 'react'
 import Link from 'next/link'
 import type { Todo } from '@/types/todo'
-import { IconCheck, IconTrash, IconCircle, IconCheckCircle } from '@/components/todo/icons'
+import { IconCheck, IconTrash, IconCircle, IconCheckCircle } from '@/components/Todo/icons'
 import styles from './TodoItem.module.css'
 
 type Props = {

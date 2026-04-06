@@ -61,7 +61,9 @@ export const useAuthStore = create<AuthState>()(
         set({
           user: data.user,
         }),
-      logout: () => set({ user: null }),
+      logout: () => {
+        set({ user: null })
+      },
       setHydrated: (v) => set({ _hasHydrated: v }),
       setSessionReady: (v) => set({ _sessionReady: v }),
     }),
@@ -81,7 +83,7 @@ export const fetchAuthSession = async () => {
 
   try {
     // 与后端 /api/get-user 一致：POST + { userId }；无本地 user 时传 0，由 BFF 从 JWT 补全
-    const json = await request<{ success?: boolean; data?:  AuthUser  }>('/api/get-user', {
+    const json = await request<{ success?: boolean; data?: AuthUser }>('/api/get-user', {
       body: { userId: user?.userId ?? 0 },
       cache: 'no-store',
     })

@@ -8,6 +8,7 @@ import {
 } from '@/stores/authStore'
 import styles from './login/login.module.css'
 import { request } from '@/lib/httpClient'
+import { useBroadcastChannel } from '@/hooks/useBroadCastChannel'     
 
 const LoginPage: FC = () => {
   const router = useRouter()
@@ -15,6 +16,7 @@ const LoginPage: FC = () => {
   const sessionReady = useAuthStore((s) => s._sessionReady)
   const setUserFromLogin = useAuthStore((s) => s.setUserFromLogin)
 
+  const { postMessage } = useBroadcastChannel()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -34,6 +36,10 @@ const LoginPage: FC = () => {
       console.log('res', res)
       setUserFromLogin(res.data as LoginDataPublic)
       router.push('/')
+
+      postMessage({ type: 'login' });
+     
+
     } catch {
       setError('登录失败')
     } finally {

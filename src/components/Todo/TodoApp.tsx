@@ -8,10 +8,10 @@ import { useAuthStore } from '@/stores/authStore'
 import { useTodos } from '@/hooks/useTodos'
 import type { Todo, FilterType } from '@/types/todo'
 import TodoItem from './TodoItem'
-import { IconPlus, IconSun, IconMoon, IconList } from '@/components/todo/icons'
+import { IconPlus, IconSun, IconMoon, IconList } from '@/components/Todo/icons'
 import styles from './TodoApp.module.css'
 import { request } from '@/lib/httpClient'
-
+import { useBroadcastChannel } from '@/hooks/useBroadCastChannel'
 const FILTERS: { key: FilterType; label: string }[] = [
   { key: 'all', label: '全部' },
   { key: 'active', label: '未完成' },
@@ -32,6 +32,7 @@ const TodoApp: FC<TodoAppProps> = ({ initialTodos, skipInitialFetch = false }) =
   const [filter, setFilter] = useState<FilterType>('all')
   const [inputValue, setInputValue] = useState('')
 
+  const { postMessage } = useBroadcastChannel()
   const {
     addTodo,
     toggleTodo,
@@ -97,6 +98,7 @@ const TodoApp: FC<TodoAppProps> = ({ initialTodos, skipInitialFetch = false }) =
                 } finally {
                   logout()
                   router.replace('/login')
+                  postMessage({ type: 'logout' });
                 }
               }}
             >

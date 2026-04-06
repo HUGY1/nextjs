@@ -5,6 +5,7 @@ import '@/styles/globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { initPerformanceReporting } from '@/lib/performance'
 import { rehydrateAuthStore } from '@/stores/authStore'
+import { BroadcastListener } from '@/components/BroadCastListener'
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   useEffect(() => {
@@ -21,6 +22,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
 
   return (
     <ThemeProvider>
+      <BroadcastListener />
       <Component {...pageProps} />
     </ThemeProvider>
   )
